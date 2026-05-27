@@ -27,6 +27,7 @@ matchRouter.get('/', async (req, res) => {
 
     res.json({ data })
   } catch (e) {
+    console.error('Failed to list matches:', e)
     res.status(500).json({ error: 'Failed to list matches' })
   }
 })
@@ -49,6 +50,11 @@ matchRouter.post('/', async (req, res) => {
       awayScore: awayScore ?? 0,
       status: getMatchStatus(startTime, endTime)
     }).returning();
+
+    if (res.app.locals.broadCastMatchCreated) {
+      res.app.locals.broadCastMatchCreated(event);
+    }
+
     res.status(201).json({ data: event });
   } catch (e) {
     res.status(500).json({ error: "Failed to create match.", details: JSON.stringify(e) })
